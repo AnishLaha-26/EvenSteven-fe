@@ -1,119 +1,4 @@
-EvenSteven is a mobile-first app designed to help friend groups effortlessly split expenses, track group balances, and settle up with each other—ideal for group trips, events, or shared purchases.
-
-🧩 Monorepo Structure
-bash
-Copy
-Edit
-EvenSteven/
-├── frontend/         # React + Vite + Tailwind
-└── backend/          # Node.js + Express (Django optional for admin)
-🖼 Frontend – /frontend
-Built with:
-
-Vite + React + TypeScript
-
-TailwindCSS for styling
-
-React Router for screen transitions
-
-Context API or Zustand for state management (optional)
-
-🔧 Setup
-bash
-Copy
-Edit
-cd frontend
-npm install
-npm run dev
-🗺 Pages
-/ – Home screen (New Group / Join Group)
-
-/create-group – Create a new group
-
-/join-group – Join group using code
-
-/group/:id – Group dashboard & overview
-
-/group/:id/add-expense – Add a shared expense
-
-/group/:id/add-payment – Record payment between members
-
-/group/:id/add-person – Add someone new
-
-📦 Features
-Clean, responsive UI (mobile-first)
-
-Reusable components (buttons, inputs, cards)
-
-Invite code system
-
-Real-time balance updates (via API)
-
-Custom split support
-
-⚙️ Backend – /backend
-Built with:
-
-Node.js + Express
-
-MongoDB (or PostgreSQL)
-
-JWT-based Authentication (optional)
-
-REST API for frontend to consume
-
-🔧 Setup
-bash
-Copy
-Edit
-cd backend
-npm install
-npm run dev
-Make sure .env contains:
-
-env
-Copy
-Edit
-PORT=5000
-MONGO_URI=mongodb://localhost:27017/evensteven
-JWT_SECRET=your_secret_key
-📁 API Structure
-Endpoint	Method	Description
-/groups	POST	Create group
-/groups/:id	GET	Get group detail
-/groups/:id/expenses	POST	Add new expense
-/groups/:id/payments	POST	Record a payment
-/groups/:id/members	POST	Add new person
-/groups/join/:code	POST	Join group by code
-
-🧰 Admin (Optional with Django)
-If using Django for admin:
-
-Admin panel for managing users and viewing financials
-
-Connect via API or shared DB
-
-Useful for enterprise-style analytics or team-level control
-
-📌 Tech Stack
-Layer	Tech
-Frontend	React + Vite + TS + Tailwind
-Backend	Node.js + Express
-Database	MongoDB or PostgreSQL
-Optional	Django (admin interface)
-
-👨‍👩‍👧‍👦 Use Case Example
-Alice creates a group for her trip to Bali.
-
-Bob and Carla join using the invite code.
-
-Each time someone pays, they log an expense.
-
-The app calculates who owes what to whom.
-
-At the end, one tap shows how to settle up fairly.
-
-
+# 🧾 EvenSteven – Cost Sharing App
 
 <div align="center">
   <a href="https://shipwrecked.hackclub.com/?t=ghrm" target="_blank">
@@ -122,3 +7,47 @@ At the end, one tap shows how to settle up fairly.
          style="width: 35%;">
   </a>
 </div>
+ 
+[![Frontend](https://img.shields.io/badge/Frontend-React-blue)](./frontend)
+[![Backend](https://img.shields.io/badge/Backend-Node.js-green)](./backend)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+EvenSteven is a mobile-first app that helps friend groups split costs fairly and transparently. Whether it’s a road trip, house party, or shared bills, EvenSteven helps everyone stay square.
+
+---
+
+## 📦 Project Structure
+EvenSteven/
+├── frontend/ # React + Vite + Tailwind
+└── backend/ # Node.js + Express (or Django for admin)
+
+
+---
+
+## ✨ Features
+
+- Create or join cost-sharing groups
+- Track expenses and payments
+- Invite friends with a shareable code
+- Smart balancing: see who owes what
+- Mobile-first UI with TailwindCSS
+- REST API for all core operations
+
+---
+
+## 🖼 Frontend Setup (`/frontend`)
+
+### 🛠 Tech Stack
+- React + TypeScript
+- Vite
+- TailwindCSS
+- React Router
+
+### 🚀 Installation
+
+```bash
+cd frontend
+npm install
+npm run dev
+
+
