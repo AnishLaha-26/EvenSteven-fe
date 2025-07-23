@@ -124,7 +124,7 @@ export default function JoinGroupPage() {
             <input
               type="text"
               className="input"
-              placeholder="- - -  - - -"
+              placeholder="– – – – – –"
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
               onFocus={() => playClick()}

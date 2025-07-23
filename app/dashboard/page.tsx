@@ -8,14 +8,16 @@ import { useTheme } from "@/components/theme-provider"
 import { useSound } from "@/hooks/use-sound"
 import { useAuth } from "@/contexts/auth-context"
 import { ProtectedRoute } from "@/components/protected-route"
-import { groupAPI, UserGroup } from "@/lib/api"
+import { groupAPI, UserGroup, BalanceSummary } from "@/lib/api"
 
 export default function DashboardPage() {
   const { theme, toggleTheme } = useTheme()
   const { playClick } = useSound()
   const { user, logout } = useAuth()
   const [userGroups, setUserGroups] = useState<UserGroup[]>([])
+  const [groupBalances, setGroupBalances] = useState<Record<number, number>>({})
   const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingBalances, setIsLoadingBalances] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const handleThemeToggle = () => {
@@ -45,19 +47,62 @@ export default function DashboardPage() {
     }
   }
 
-  // Fetch user groups on component mount
+  // Fetch user groups and their net balances on component mount
   useEffect(() => {
     const fetchUserGroups = async () => {
       try {
         setIsLoading(true)
         setError(null)
+        console.log('🔄 Fetching user groups...')
+        
+        // First, get the list of user groups
         const groups = await groupAPI.getUserGroups()
+        console.log('📊 Loaded groups:', groups)
         setUserGroups(groups)
+        
+        // Then fetch net balance for each group using the same API as group dashboard
+        await fetchAllGroupBalances(groups)
+        
       } catch (error) {
-        console.error('Error fetching user groups:', error)
+        console.error('❌ Error fetching user groups:', error)
         setError('Failed to load groups')
       } finally {
         setIsLoading(false)
+      }
+    }
+
+    const fetchAllGroupBalances = async (groups: UserGroup[]) => {
+      try {
+        setIsLoadingBalances(true)
+        console.log('💰 Fetching net balances for all groups...')
+        
+        const balancePromises = groups.map(async (group) => {
+          try {
+            console.log(`💰 Fetching balance for group ${group.id}: ${group.name}`)
+            const balanceSummary = await groupAPI.getBalanceSummary(group.id)
+            console.log(`✅ Balance for ${group.name}:`, balanceSummary.net_balance)
+            return { groupId: group.id, balance: balanceSummary.net_balance }
+          } catch (error) {
+            console.error(`❌ Failed to fetch balance for group ${group.id}:`, error)
+            return { groupId: group.id, balance: 0 } // Default to 0 if balance fetch fails
+          }
+        })
+        
+        const balanceResults = await Promise.all(balancePromises)
+        
+        // Convert to Record<number, number> for easy lookup
+        const balancesMap = balanceResults.reduce((acc, { groupId, balance }) => {
+          acc[groupId] = balance
+          return acc
+        }, {} as Record<number, number>)
+        
+        console.log('📊 All group balances loaded:', balancesMap)
+        setGroupBalances(balancesMap)
+        
+      } catch (error) {
+        console.error('❌ Error fetching group balances:', error)
+      } finally {
+        setIsLoadingBalances(false)
       }
     }
 
@@ -66,11 +111,16 @@ export default function DashboardPage() {
 
   // Format balance display with color coding
   const formatBalance = (balance: number) => {
+    console.log('💰 Formatting balance:', balance)
+    
     if (balance > 0) {
+      // Money owed TO the user (green)
       return { text: `+$${balance.toFixed(2)}`, className: 'balance-positive' }
     } else if (balance < 0) {
+      // Money owed BY the user (red)
       return { text: `-$${Math.abs(balance).toFixed(2)}`, className: 'balance-negative' }
     } else {
+      // Settled balance (neutral with star)
       return { text: '$0.00 ✨', className: 'balance-zero' }
     }
   }
@@ -91,7 +141,7 @@ export default function DashboardPage() {
       return weeks === 1 ? '1 week ago' : `${weeks} weeks ago`
     } else {
       const months = Math.floor(diffDays / 30)
-      return months === 1 ? '1 month ago' : `${months} months ago`
+      return months === 1 ? '1 month ago' : null
     }
   }
 
@@ -200,20 +250,40 @@ export default function DashboardPage() {
             </div>
           ) : (
             userGroups.map((group) => {
-              const balance = formatBalance(group.user_balance)
+              // Use the net balance from the balance summary API (same as group dashboard)
+              const netBalance = groupBalances[group.id] ?? 0
+              const balance = formatBalance(netBalance)
               const timeAgo = formatTimeAgo(group.last_updated)
               
               return (
                 <Link key={group.id} href={`/group-dashboard/${group.id}`}>
                   <div className="card">
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div>
-                        <h4 style={{ marginBottom: "0.25rem" }}>{group.name}</h4>
-                        <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem" }}>
-                          {group.member_count} {group.member_count === 1 ? 'member' : 'members'} • {timeAgo}
-                        </p>
+                      <div style={{ flex: 1 }}>
+                        <h4 style={{ marginBottom: "0.25rem", color: "var(--text-primary)" }}>{group.name}</h4>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
+                          {timeAgo && (
+                            <>
+                              <span>•</span>
+                              <span>{timeAgo}</span>
+                            </>
+                          )}
+                        </div>
                       </div>
-                      <span className={balance.className}>{balance.text}</span>
+                      <div style={{ textAlign: "right" }}>
+                        <span className={balance.className} style={{ fontSize: "1.1rem", fontWeight: "600" }}>
+                          {isLoadingBalances ? '...' : balance.text}
+                        </span>
+                        <div style={{ fontSize: "0.75rem", color: "var(--text-light)", marginTop: "0.25rem" }}>
+                          {isLoadingBalances ? 'Loading...' : (
+                            <>
+                              {balance.className === 'balance-positive' && 'You are owed'}
+                              {balance.className === 'balance-negative' && 'You owe'}
+                              {balance.className === 'balance-zero' && 'All settled'}
+                            </>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </Link>
@@ -226,3 +296,6 @@ export default function DashboardPage() {
     </ProtectedRoute>
   )
 }
+
+
+
