@@ -1,30 +1,9 @@
-# Modernize page design
+EvenSteven is a mobile-first app designed to help friend groups effortlessly split expenses, track group balances, and settle up with each other—ideal for group trips, events, or shared purchases.
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
-
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/anishanishlaha-2244s-projects/v0-modernize-page-design)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/YsGFux0I3Fa)
-
-## Overview
-
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
-
-## Deployment
-
-Your project is live at:
-
-**[https://vercel.com/anishanishlaha-2244s-projects/v0-modernize-page-design](https://vercel.com/anishanishlaha-2244s-projects/v0-modernize-page-design)**
-
-## Build your app
-
-Continue building your app on:
-
-**[https://v0.dev/chat/projects/YsGFux0I3Fa](https://v0.dev/chat/projects/YsGFux0I3Fa)**
-
-## How It Works
-
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+<div align="center">
+  <a href="https://shipwrecked.hackclub.com/?t=ghrm" target="_blank">
+    <img src="https://hc-cdn.hel1.your-objectstorage.com/s/v3/739361f1d440b17fc9e2f74e49fc185d86cbec14_badge.png" 
+         alt="This project is part of Shipwrecked, the world's first hackathon on an island!" 
+         style="width: 35%;">
+  </a>
+</div>
