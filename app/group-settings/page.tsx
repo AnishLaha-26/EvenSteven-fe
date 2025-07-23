@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ArrowLeft, Share2, Users, Trash2, Moon, Sun, UserMinus, LogOut, AlertTriangle, UserPlus, Edit3, Loader2 } from "lucide-react"
@@ -20,7 +20,7 @@ interface Member {
   userId: number
 }
 
-export default function GroupSettingsPage() {
+function GroupSettingsContent() {
   const { theme, toggleTheme } = useTheme()
   const { playClick, playError, playSuccess } = useSound()
   const { user, loading: authLoading } = useAuth()
@@ -855,5 +855,32 @@ export default function GroupSettingsPage() {
       )}
       </div>
     </ProtectedRoute>
+  )
+}
+
+// Loading component for Suspense fallback
+function LoadingGroupSettings() {
+  return (
+    <ProtectedRoute>
+      <div className="min-h-screen bg-background text-foreground">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading group settings...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ProtectedRoute>
+  )
+}
+
+// Main export with Suspense boundary
+export default function GroupSettingsPage() {
+  return (
+    <Suspense fallback={<LoadingGroupSettings />}>
+      <GroupSettingsContent />
+    </Suspense>
   )
 }

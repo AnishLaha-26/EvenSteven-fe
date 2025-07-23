@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { ArrowLeft, Moon, Sun, DollarSign, User, Calendar, List, BarChart3, Eye, Edit, Trash2 } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
@@ -10,7 +10,7 @@ import { paymentAPI, groupAPI, Payment, PaymentStatistics, CreatePaymentPayload 
 import { useAuth } from "../../contexts/auth-context"
 import { useSearchParams, useRouter } from 'next/navigation'
 
-export default function AddPaymentPage() {
+function AddPaymentContent() {
   const { theme, toggleTheme } = useTheme()
   const { playClick, playSuccess } = useSound()
   const { user } = useAuth()
@@ -553,5 +553,32 @@ export default function AddPaymentPage() {
         </div>
       </div>
     </ProtectedRoute>
+  )
+}
+
+// Loading component for Suspense fallback
+function LoadingPaymentPage() {
+  return (
+    <ProtectedRoute>
+      <div className="min-h-screen bg-background text-foreground">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading payment page...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ProtectedRoute>
+  )
+}
+
+// Main export with Suspense boundary
+export default function AddPaymentPage() {
+  return (
+    <Suspense fallback={<LoadingPaymentPage />}>
+      <AddPaymentContent />
+    </Suspense>
   )
 }
