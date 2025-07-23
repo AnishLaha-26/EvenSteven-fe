@@ -4,9 +4,14 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { AuthProvider } from "@/contexts/auth-context"
 
 export const metadata = {
-  title: "SplitWise - Expense Sharing App",
+  title: "EvenSteven",
   description: "Split expenses easily with friends and family",
-    generator: 'v0.dev'
+  generator: 'v0.dev',
+  icons: {
+    icon: '/logo.png',
+    shortcut: '/logo.png',
+    apple: '/logo.png',
+  },
 }
 
 export default function RootLayout({
