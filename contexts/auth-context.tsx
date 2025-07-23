@@ -43,27 +43,47 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Check if user is authenticated on app load
   useEffect(() => {
     const initializeAuth = async () => {
+      console.log('🔐 Auth initialization started')
       const token = localStorage.getItem('accessToken')
+      const refreshToken = localStorage.getItem('refreshToken')
+      
+      console.log('🔐 Tokens found:', { 
+        hasAccessToken: !!token, 
+        hasRefreshToken: !!refreshToken,
+        accessToken: token ? `${token.substring(0, 20)}...` : null
+      })
+      
       if (token) {
         try {
+          console.log('🔐 Attempting to get user profile...')
           const userData = await authAPI.getProfile()
+          console.log('🔐 Profile loaded successfully:', userData)
           setUser(userData)
         } catch (error) {
+          console.log('🔐 Profile load failed, attempting refresh...', error)
           // Token might be expired, try to refresh
-          const refreshToken = localStorage.getItem('refreshToken')
           if (refreshToken) {
             try {
+              console.log('🔐 Refreshing token...')
               await authAPI.refreshToken(refreshToken)
               const userData = await authAPI.getProfile()
+              console.log('🔐 Profile loaded after refresh:', userData)
               setUser(userData)
             } catch (refreshError) {
+              console.log('🔐 Refresh failed, clearing tokens:', refreshError)
               // Refresh failed, clear tokens
               localStorage.removeItem('accessToken')
               localStorage.removeItem('refreshToken')
             }
+          } else {
+            console.log('🔐 No refresh token available')
           }
         }
+      } else {
+        console.log('🔐 No access token found')
       }
+      
+      console.log('🔐 Auth initialization complete, loading set to false')
       setLoading(false)
     }
 

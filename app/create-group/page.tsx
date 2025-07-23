@@ -249,32 +249,6 @@ export default function CreateGroupPage() {
             </div>
 
             <div className="form-group">
-              <label className="label">Description (Optional)</label>
-              <div style={{ position: "relative" }}>
-                <div style={{ position: "absolute", left: "1rem", top: "0.9rem", zIndex: 1 }}>
-                  <FileText size={16} style={{ color: "var(--text-secondary)" }} />
-                </div>
-                <textarea
-                  className="input"
-                  placeholder="Add a description for your group..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  onFocus={() => playClick()}
-                  rows={3}
-                  style={{
-                    paddingLeft: "2.5rem",
-                    resize: "vertical",
-                    minHeight: "4rem",
-                    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-                    fontSize: "1rem",
-                    lineHeight: "1.5",
-                    paddingTop: "0.8rem"
-                  }}
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
               <label className="label">Currency</label>
               <div style={{ position: "relative" }}>
                 <div style={{ position: "absolute", left: "1rem", top: "0.9rem", zIndex: 1 }}>
@@ -321,72 +295,9 @@ export default function CreateGroupPage() {
               </div>
             </div>
 
-            <div className="form-group">
-              <label className="label">Add Participants (Email addresses)</label>
-              {participants.map((participant, index) => (
-                <div key={index} style={{ display: "flex", gap: "0.5rem", marginBottom: "0.75rem" }}>
-                  <div style={{ position: "relative", flex: 1 }}>
-                    <div style={{ position: "absolute", left: "1rem", top: "0.9rem", zIndex: 1 }}>
-                      <Mail size={16} style={{ color: "var(--text-secondary)" }} />
-                    </div>
-                    <input
-                      type="email"
-                      className="input"
-                      placeholder={`participant${index + 1}@example.com`}
-                      value={participant}
-                      onChange={(e) => updateParticipant(index, e.target.value)}
-                      onFocus={() => playClick()}
-                      style={{
-                        paddingLeft: "2.5rem",
-                        borderColor: participant && !isValidEmail(participant) ? "var(--error)" : "var(--border)",
-                        paddingTop: "0.8rem"
-                      }}
-                    />
-                  </div>
-                  {participants.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeParticipant(index)}
-                      style={{
-                        background: "var(--error)",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "0.5rem",
-                        padding: "0.75rem",
-                        cursor: "pointer",
-                        transition: "all 0.2s ease",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        minWidth: "3rem"
-                      }}
-                    >
-                      <X size={16} />
-                    </button>
-                  )}
-                </div>
-              ))}
-
-              <button
-                type="button"
-                onClick={addParticipant}
-                className="button button-secondary"
-                style={{ marginTop: "0.5rem" }}
-              >
-                <Plus className="icon" />
-                Add Another Person
-              </button>
+            
               
-              <p style={{ 
-                color: "var(--text-secondary)", 
-                fontSize: "1rem",
-                lineHeight: "1.5",
-                marginTop: "0.75rem",
-                fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-              }}>
-                💡 Tip: You can create a group with just yourself and add participants later using the group code
-              </p>
-            </div>
+            
 
             <button
               type="submit"

@@ -2,7 +2,8 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Camera, Moon, Sun } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
@@ -10,12 +11,32 @@ import { useSound } from "@/hooks/use-sound"
 import { ProtectedRoute } from "@/components/protected-route"
 
 export default function AddExpensePage() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const { theme, toggleTheme } = useTheme()
   const { playClick, playSuccess } = useSound()
   const [title, setTitle] = useState("")
   const [amount, setAmount] = useState("")
   const [paidBy, setPaidBy] = useState("Person 1")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [groupId, setGroupId] = useState<string | null>(null)
+  
+  useEffect(() => {
+    const groupIdParam = searchParams.get('groupId')
+    if (groupIdParam) {
+      setGroupId(groupIdParam)
+    }
+  }, [searchParams])
+  
+  const handleBack = () => {
+    playClick()
+    if (groupId) {
+      router.push(`/group-dashboard/${groupId}`)
+    } else {
+      // Fallback to dashboard if no groupId is available
+      router.push('/dashboard')
+    }
+  }
 
   const handleThemeToggle = () => {
     playClick()
@@ -56,15 +77,15 @@ export default function AddExpensePage() {
     <ProtectedRoute>
       <div className="container">
       <div className="header">
-        <Link href="/group-dashboard">
-          <button className="back-button" onClick={() => playClick()}>
-            <ArrowLeft className="icon" />
-          </button>
-        </Link>
-        <h1>Add Expense 💸</h1>
-        <button className="theme-toggle" onClick={handleThemeToggle}>
-          {theme === "light" ? <Moon /> : <Sun />}
+        <button className="back-button" onClick={handleBack}>
+          <ArrowLeft className="icon" />
         </button>
+        <h1>Add Expense 💸</h1>
+        <div>
+          <button className="theme-toggle" onClick={handleThemeToggle}>
+            {theme === "light" ? <Moon /> : <Sun />}
+          </button>
+        </div>
       </div>
 
       <div className="main-content">
