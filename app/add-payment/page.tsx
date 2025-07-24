@@ -33,6 +33,7 @@ function AddPaymentContent() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [amountError, setAmountError] = useState<string | null>(null)
   
   // UI state
   const [activeTab, setActiveTab] = useState<'create' | 'list' | 'stats'>('create')
@@ -152,14 +153,53 @@ function AddPaymentContent() {
     toggleTheme()
   }
 
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setAmount(value)
+    
+    // Clear previous amount error
+    setAmountError(null)
+    
+    // Validate amount if not empty
+    if (value) {
+      const numValue = Number.parseFloat(value)
+      
+      if (isNaN(numValue)) {
+        setAmountError("Please enter a valid number")
+        return
+      }
+      
+      if (numValue <= 0) {
+        setAmountError("Amount must be greater than $0")
+        return
+      }
+      
+      if (numValue > 50000) {
+        setAmountError("Payment amount cannot exceed $50,000")
+        return
+      }
+      
+      if (numValue > 10000) {
+        setAmountError("⚠️ Large payment amount. Please verify this is correct.")
+      }
+    }
+  }
+
   const handleRecordPayment = async () => {
     if (!amount || !selectedRecipient) {
       setError('Please fill in all required fields')
       return
     }
 
-    if (parseFloat(amount) <= 0) {
+    const numAmount = parseFloat(amount)
+    if (isNaN(numAmount) || numAmount <= 0) {
       setError('Amount must be greater than 0')
+      return
+    }
+    
+    // Check for maximum amount limit
+    if (numAmount > 50000) {
+      setError('Payment amount cannot exceed $50,000. Please contact support for larger payments.')
       return
     }
 
@@ -211,7 +251,48 @@ function AddPaymentContent() {
       }
       
     } catch (error: any) {
-      setError(error.response?.data?.detail || 'Failed to record payment')
+      console.error('Error recording payment:', error)
+      
+      let errorMessage = 'Failed to record payment'
+      
+      if (error.response?.status === 400) {
+        // Handle 400 Bad Request errors
+        const errorData = error.response.data
+        
+        if (errorData.amount) {
+          // Amount-specific validation errors
+          if (Array.isArray(errorData.amount)) {
+            errorMessage = `Amount Error: ${errorData.amount.join(', ')}`
+          } else {
+            errorMessage = `Amount Error: ${errorData.amount}`
+          }
+        } else if (errorData.detail) {
+          errorMessage = errorData.detail
+        } else if (errorData.non_field_errors) {
+          errorMessage = Array.isArray(errorData.non_field_errors) 
+            ? errorData.non_field_errors.join(', ')
+            : errorData.non_field_errors
+        } else {
+          // Check for other field errors
+          const fieldErrors = []
+          for (const [field, errors] of Object.entries(errorData)) {
+            if (Array.isArray(errors)) {
+              fieldErrors.push(`${field}: ${errors.join(', ')}`)
+            } else if (typeof errors === 'string') {
+              fieldErrors.push(`${field}: ${errors}`)
+            }
+          }
+          if (fieldErrors.length > 0) {
+            errorMessage = fieldErrors.join('; ')
+          }
+        }
+      } else if (error.response?.data?.detail) {
+        errorMessage = error.response.data.detail
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -305,11 +386,24 @@ function AddPaymentContent() {
                   className="input"
                   placeholder="0.00"
                   value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+                  onChange={handleAmountChange}
                   onFocus={() => playClick()}
                   style={{ fontSize: "1.5rem", textAlign: "center" }}
                   required
                 />
+                {amountError && (
+                  <p style={{ 
+                    color: amountError.includes('⚠️') ? "var(--warning)" : "var(--error)", 
+                    fontSize: "0.875rem", 
+                    marginTop: "0.5rem",
+                    padding: "0.5rem",
+                    backgroundColor: amountError.includes('⚠️') ? "var(--warning-bg)" : "var(--error-bg)",
+                    borderRadius: "0.25rem",
+                    border: `1px solid ${amountError.includes('⚠️') ? 'var(--warning)' : 'var(--error)'}`
+                  }}>
+                    {amountError}
+                  </p>
+                )}
               </div>
 
               <div className="form-group">
